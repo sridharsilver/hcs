@@ -25,6 +25,7 @@ const Footer = () => (
         <h4 className="font-display font-semibold mb-4 text-base">Quick Links</h4>
         <ul className="space-y-2 text-sm text-primary-foreground/80">
           {[
+            ["Home", "/"],
             ["About Us", "/about"],
             ["Academics", "/academics"],
             ["Admissions", "/admissions"],
