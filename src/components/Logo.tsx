@@ -7,8 +7,8 @@ const Logo = () => (
       <GraduationCap className="w-6 h-6 text-primary-foreground" />
     </div>
     <div className="leading-tight">
-      <p className="font-display font-bold text-base text-primary">Hyderabad Central</p>
-      <p className="text-[11px] tracking-widest uppercase text-muted-foreground">Schools</p>
+      <p className="font-display font-bold text-base text-primary whitespace-nowrap">Hyderabad Central Schools</p>
+      <p className="text-[11px] tracking-widest uppercase text-muted-foreground">Learn Today, Lead Tomorrow</p>
     </div>
   </Link>
 );
