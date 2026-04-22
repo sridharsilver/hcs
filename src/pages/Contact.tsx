@@ -25,7 +25,7 @@ const Contact = () => {
     <>
       <PageHero title="Contact Us" subtitle="We'd love to hear from you. Reach out and we'll respond within 24 hours." />
 
-      <section className="py-20 bg-primary-glow">
+      <section className="py-20 bg-primary-foreground">
         <div className="container grid lg:grid-cols-3 gap-6 mb-14">
           {[
             { icon: Phone, t: "Call Us", lines: ["+91 40 2354 1100", "+91 40 2305 4400"] },
