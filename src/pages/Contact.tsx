@@ -44,68 +44,37 @@ const Contact = () => {
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-10">
+        <div className="grid lg:grid-cols-2 gap-10 items-start">
           <Card className="border-border/60">
             <CardContent className="p-8">
               <h2 className="text-2xl font-display font-semibold mb-2">Send Us a Message</h2>
-              <p className="text-sm text-muted-foreground mb-6">Whether you have a question or want to plan a campus visit, we're here.</p>
+              <p className="text-sm text-muted-foreground mb-6">Have a question or want to plan a campus visit? We're here.</p>
               <form onSubmit={onSubmit} className="space-y-5">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2"><Label htmlFor="n">Name</Label><Input id="n" required placeholder="Your name" /></div>
                   <div className="space-y-2"><Label htmlFor="e">Email</Label><Input id="e" type="email" required placeholder="you@example.com" /></div>
                 </div>
-                <div className="space-y-2"><Label htmlFor="s">Subject</Label><Input id="s" required placeholder="How can we help?" /></div>
                 <div className="space-y-2"><Label htmlFor="m">Message</Label><Textarea id="m" rows={5} required placeholder="Type your message..." /></div>
-                <Button type="submit" disabled={submitting} className="gradient-primary text-primary-foreground border-0" size="lg">
+                <Button type="submit" disabled={submitting} className="gradient-primary text-primary-foreground border-0 w-full" size="lg">
                   {submitting ? "Sending..." : "Send Message"}
                 </Button>
               </form>
             </CardContent>
           </Card>
 
-          <div className="space-y-6">
-            <Card className="border-border/60">
-              <CardContent className="p-7">
-                <h3 className="font-display font-semibold text-xl mb-5">Campus Contacts</h3>
-                <div className="space-y-5">
-                  {branches.map((b) => (
-                    <div key={b.slug} className="pb-5 last:pb-0 border-b border-border last:border-0">
-                      <p className="font-semibold mb-1">{b.name}</p>
-                      <p className="text-sm text-muted-foreground flex items-start gap-2"><MapPin className="w-4 h-4 mt-0.5 shrink-0 text-primary" />{b.address}</p>
-                      <p className="text-sm text-muted-foreground flex items-center gap-2 mt-1"><Phone className="w-4 h-4 text-primary" />{b.phone}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border/60">
-              <CardContent className="p-7">
-                <h3 className="font-display font-semibold text-xl mb-4">Follow Us</h3>
-                <p className="text-sm text-muted-foreground mb-5">Daily moments and updates from across our campuses.</p>
-                <div className="flex gap-3">
-                  {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
-                    <a key={i} href="#" aria-label="social" className="w-11 h-11 rounded-full gradient-primary text-primary-foreground flex items-center justify-center hover:scale-110 transition-smooth">
-                      <Icon className="w-5 h-5" />
-                    </a>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border/60 overflow-hidden">
-              <div className="aspect-video relative gradient-primary flex items-center justify-center">
-                <div className="absolute inset-0 opacity-20" style={{
-                  backgroundImage: "linear-gradient(0deg, white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)",
-                  backgroundSize: "40px 40px",
-                }} />
-                <div className="relative text-center text-primary-foreground">
-                  <MapPin className="w-12 h-12 mx-auto mb-2 text-accent" />
-                  <p className="font-semibold">Map Placeholder</p>
-                </div>
+          <Card className="border-border/60">
+            <CardContent className="p-7">
+              <h3 className="font-display font-semibold text-xl mb-4">Follow Us</h3>
+              <p className="text-sm text-muted-foreground mb-5">Daily moments and updates from across our campuses.</p>
+              <div className="flex gap-3">
+                {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
+                  <a key={i} href="#" aria-label="social" className="w-11 h-11 rounded-full gradient-primary text-primary-foreground flex items-center justify-center hover:scale-110 transition-smooth">
+                    <Icon className="w-5 h-5" />
+                  </a>
+                ))}
               </div>
-            </Card>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </section>
     </>
