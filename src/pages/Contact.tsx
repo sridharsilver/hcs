@@ -44,7 +44,7 @@ const Contact = () => {
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-10 items-start">
+        <div className="grid lg:grid-cols-[2fr_1fr] gap-8 items-start max-w-5xl mx-auto">
           <Card className="border-border/60">
             <CardContent className="p-8">
               <h2 className="text-2xl font-display font-semibold mb-2">Send Us a Message</h2>
