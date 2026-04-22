@@ -30,6 +30,7 @@ const Footer = () => (
             ["Admissions", "/admissions"],
             ["Our Branches", "/branches"],
             ["Gallery", "/gallery"],
+            ["Contact", "/contact"],
           ].map(([label, to]) => (
             <li key={to}><Link to={to} className="hover:text-accent transition-smooth">{label}</Link></li>
           ))}
