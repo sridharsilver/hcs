@@ -51,8 +51,8 @@ export function AdminSidebar() {
             className={({ isActive }) =>
               `flex items-center gap-2 rounded-md transition-smooth ${
                 isActive
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "hover:bg-secondary hover:text-secondary-foreground"
+                  ? "bg-accent text-accent-foreground font-semibold"
+                  : "text-primary-foreground/80 hover:bg-primary-foreground/10 hover:text-primary-foreground"
               }`
             }
           >
@@ -64,17 +64,17 @@ export function AdminSidebar() {
     ));
 
   return (
-    <Sidebar collapsible="icon">
-      <SidebarContent className="bg-background">
+    <Sidebar collapsible="icon" className="border-r-0">
+      <SidebarContent className="gradient-primary text-primary-foreground">
         <SidebarGroup>
-          <SidebarGroupLabel>Main</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-primary-foreground/60">Main</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>{renderItems(mainItems)}</SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Content</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-primary-foreground/60">Content</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>{renderItems(contentItems)}</SidebarMenu>
           </SidebarGroupContent>
