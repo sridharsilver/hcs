@@ -44,20 +44,25 @@ export function AdminSidebar() {
   const renderItems = (items: typeof mainItems) =>
     items.map((item) => (
       <SidebarMenuItem key={item.title}>
-        <SidebarMenuButton asChild isActive={isActive(item.url)}>
+        <SidebarMenuButton
+          asChild
+          isActive={isActive(item.url)}
+          tooltip={item.title}
+          className="h-10 hover:bg-transparent data-[active=true]:bg-transparent"
+        >
           <NavLink
             to={item.url}
             end
             className={({ isActive }) =>
-              `flex items-center gap-2 rounded-md transition-smooth ${
+              `flex items-center gap-3 rounded-lg px-3 transition-smooth ${
                 isActive
-                  ? "bg-accent text-accent-foreground font-semibold"
-                  : "text-primary-foreground/80 hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                  ? "bg-primary-foreground text-primary font-semibold shadow-card"
+                  : "text-primary-foreground/75 hover:bg-primary-foreground/10 hover:text-primary-foreground"
               }`
             }
           >
-            <item.icon className="h-4 w-4" />
-            {!collapsed && <span>{item.title}</span>}
+            <item.icon className="h-[18px] w-[18px] shrink-0" />
+            {!collapsed && <span className="text-sm">{item.title}</span>}
           </NavLink>
         </SidebarMenuButton>
       </SidebarMenuItem>
@@ -65,18 +70,22 @@ export function AdminSidebar() {
 
   return (
     <Sidebar collapsible="icon" className="border-r-0">
-      <SidebarContent className="gradient-primary text-primary-foreground">
+      <SidebarContent className="gradient-primary text-primary-foreground gap-2 py-2">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-primary-foreground/60">Main</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-primary-foreground/50 text-[11px] tracking-widest uppercase">
+            Main
+          </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>{renderItems(mainItems)}</SidebarMenu>
+            <SidebarMenu className="gap-1">{renderItems(mainItems)}</SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel className="text-primary-foreground/60">Content</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-primary-foreground/50 text-[11px] tracking-widest uppercase">
+            Content
+          </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>{renderItems(contentItems)}</SidebarMenu>
+            <SidebarMenu className="gap-1">{renderItems(contentItems)}</SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
