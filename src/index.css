@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Hind:wght@400;500;600;700&family=Ramabhadra&family=NTR&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 99%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 220 75% 12%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 220 70% 25%;
+
+    --secondary: 45 75% 92%;
+    --secondary-foreground: 220 70% 18%;
+
+    --muted: 220 30% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 43 74% 49%;
+    --accent-foreground: 220 70% 12%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 20% 88%;
+    --input: 220 20% 88%;
+    --ring: 220 70% 18%;
+
+    --radius: 0.75rem;
+
+    --gradient-hero: linear-gradient(135deg, hsl(220 75% 10% / 0.95), hsl(220 70% 22% / 0.88));
+    --gradient-primary: linear-gradient(135deg, hsl(220 75% 12%), hsl(220 70% 25%));
+    --gradient-soft: linear-gradient(180deg, hsl(45 60% 97%), hsl(0 0% 100%));
+    --shadow-elegant: 0 10px 40px -10px hsl(220 75% 12% / 0.3);
+    --shadow-card: 0 4px 20px -4px hsl(220 50% 20% / 0.12);
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark {
+    --background: 222 47% 6%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 220 65% 55%;
+    --primary-foreground: 220 70% 8%;
+    --primary-glow: 220 70% 70%;
+    --secondary: 220 30% 18%;
+    --secondary-foreground: 45 75% 85%;
+    --muted: 220 30% 18%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 43 74% 55%;
+    --accent-foreground: 220 70% 12%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 32% 17%;
+    --input: 217 32% 17%;
+    --ring: 213 94% 58%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', system-ui, sans-serif;
+    @apply font-semibold tracking-tight;
+  }
+
+  /* Localized Font Overrides */
+  :root[lang="hi"] body,
+  :root[lang="hi"] h1, :root[lang="hi"] h2, :root[lang="hi"] h3, :root[lang="hi"] h4, :root[lang="hi"] h5, :root[lang="hi"] h6 {
+    font-family: 'Hind', sans-serif;
+  }
+
+  :root[lang="te"] {
+    font-size: 120%;
+  }
+
+  :root[lang="te"] body {
+    font-family: 'NTR', sans-serif;
+  }
+
+  :root[lang="te"] .logo-text {
+    font-size: 0.85rem; /* Slightly smaller to compensate for root scaling and stay on one line */
+  }
+
+  :root[lang="te"] .logo-subtext {
+    font-size: 0.65rem;
+  }
+
+  :root[lang="te"] h1, :root[lang="te"] h2, :root[lang="te"] h3, :root[lang="te"] h4, :root[lang="te"] h5, :root[lang="te"] h6,
+  :root[lang="te"] header nav, :root[lang="te"] header button {
+    font-family: 'Ramabhadra', sans-serif;
+    font-weight: 400;
+  }
+}
+
+@layer utilities {
+  .gradient-hero { background: var(--gradient-hero); }
+  .gradient-primary { background: var(--gradient-primary); }
+  .gradient-soft { background: var(--gradient-soft); }
+  .shadow-elegant { box-shadow: var(--shadow-elegant); }
+  .shadow-card { box-shadow: var(--shadow-card); }
+  .transition-smooth { transition: var(--transition-smooth); }
+
+  .story-link {
+    @apply relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left;
+  }
+  .hover-lift {
+    @apply transition-smooth hover:-translate-y-1 hover:shadow-elegant;
+  }
+}
