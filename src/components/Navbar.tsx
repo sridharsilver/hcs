@@ -33,8 +33,8 @@ const Navbar = () => {
 
   const currentLanguageCode = i18n.language ? i18n.language.split('-')[0] : 'en';
   
-  // Explicitly check for false to ensure it hides when configured
-  const showLanguageSwitcher = settings ? settings.themeConfig.showLanguageSwitcher : true;
+  // Hide by default until settings are loaded to prevent flicker if it's disabled in settings
+  const showLanguageSwitcher = settings?.themeConfig?.showLanguageSwitcher ?? false;
 
   return (
     <header className="sticky top-0 z-50 bg-background/85 backdrop-blur-lg border-b border-border">
