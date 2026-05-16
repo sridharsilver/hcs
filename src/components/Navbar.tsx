@@ -24,6 +24,7 @@ const Navbar = () => {
     { to: "/academics", label: t('nav.academics') },
     { to: "/admissions", label: t('nav.admissions') },
     { to: "/gallery", label: t('nav.gallery') },
+    { to: "/branches", label: t('nav.branches') },
     { to: "/contact", label: t('nav.contact') },
   ];
 

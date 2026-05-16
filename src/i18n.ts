@@ -25,6 +25,7 @@ i18n
             academics: 'Academics',
             admissions: 'Admissions',
             gallery: 'Gallery',
+            branches: 'Branches',
             contact: 'Contact',
             admin: 'Admin Portal'
           },
@@ -401,6 +402,7 @@ i18n
             academics: 'शिक्षा',
             admissions: 'प्रवेश',
             gallery: 'गैलरी',
+            branches: 'शाखाएं',
             contact: 'संपर्क',
             admin: 'एडमिन पोर्टल'
           },
@@ -777,6 +779,7 @@ i18n
             academics: 'విద్య',
             admissions: 'అడ్మిషన్లు',
             gallery: 'గ్యాలరీ',
+            branches: 'శాఖలు',
             contact: 'సంప్రదించండి',
             admin: 'అడ్మిన్ పోర్టల్'
           },

@@ -103,8 +103,9 @@ const RoutesWithKey = () => {
         <Route path="/branches" element={<Branches />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/login" element={<Login />} />
       </Route>
+
+      <Route path="/login" element={<Login />} />
 
       {/* Admin Routes - Protected */}
       <Route 

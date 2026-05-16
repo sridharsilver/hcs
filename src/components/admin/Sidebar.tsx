@@ -1,3 +1,5 @@
+import React from 'react';
+import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { LogOut } from 'lucide-react';
 
