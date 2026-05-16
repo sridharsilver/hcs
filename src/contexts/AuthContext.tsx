@@ -20,12 +20,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        setError(error as unknown as Error);
+      }
       setSession(session);
       setUser(session?.user ?? null);
+      setIsLoading(false);
+    }).catch(err => {
+      setError(err);
       setIsLoading(false);
     });
 

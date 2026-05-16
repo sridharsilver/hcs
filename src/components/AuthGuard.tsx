@@ -10,7 +10,7 @@ export const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children })
   if (isLoading) {
     return (
       <div className="h-screen w-full flex flex-col items-center justify-center gap-4 bg-background">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
         <p className="text-muted-foreground font-medium">Authenticating...</p>
       </div>
     );
