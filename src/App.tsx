@@ -31,7 +31,6 @@ import { Gallery as AdminGallery } from "./pages/admin/gallery/Gallery";
 import { UploadGallery } from "./pages/admin/gallery/UploadGallery";
 import { GalleryCategories } from "./pages/admin/gallery/Categories";
 import { Settings as AdminSettings } from "./pages/admin/settings/Settings";
-import { Fees as AdminFees } from "./pages/admin/fees/Fees";
 import { Enquiries as AdminEnquiries } from "./pages/admin/enquiries/Enquiries";
 
 
@@ -119,7 +118,6 @@ const RoutesWithKey = () => {
         <Route path="gallery" element={<AdminGallery />} />
         <Route path="gallery/upload" element={<UploadGallery />} />
         <Route path="gallery/categories" element={<GalleryCategories />} />
-        <Route path="fees" element={<AdminFees />} />
         <Route path="enquiries" element={<AdminEnquiries />} />
         <Route path="settings" element={<AdminSettings />} />
       </Route>

@@ -12,7 +12,6 @@ export function Sidebar({ collapsed, setCollapsed, isMobile }: SidebarProps) {
     { label: 'Dashboard', path: '/admin/dashboard', icon: '📊' },
     { label: 'Students', path: '/admin/students', icon: '🎓' },
     { label: 'Teachers', path: '/admin/teachers', icon: '👥' },
-    { label: 'Fees', path: '/admin/fees', icon: '💰' },
     { label: 'Enquiries', path: '/admin/enquiries', icon: '💬' },
     { label: 'Gallery', path: '/admin/gallery', icon: '🖼️' },
     { label: 'Settings', path: '/admin/settings', icon: '⚙️' }

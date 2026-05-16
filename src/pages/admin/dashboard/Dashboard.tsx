@@ -165,7 +165,6 @@ export const Dashboard: React.FC = () => {
         {[
           { label: 'Add Student', icon: GraduationCap, path: '/admin/students/add', color: 'bg-blue-600' },
           { label: 'Enquiries', icon: MessageSquare, path: '/admin/enquiries', color: 'bg-amber-600' },
-          { label: 'Process Fee', icon: IndianRupee, path: '/admin/fees', color: 'bg-emerald-600' },
           { label: 'Post Update', icon: Plus, path: '/admin/gallery/upload', color: 'bg-purple-600' }
         ].map((action) => (
           <button
