@@ -115,6 +115,11 @@ const Login = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
+            <div className="lg:hidden mb-8 flex justify-center">
+              <div className="bg-white rounded-2xl p-3 shadow-xl border border-slate-200/50 scale-90">
+                <Logo />
+              </div>
+            </div>
             <div className="mb-10 text-center lg:text-left">
               <h1 className="text-3xl font-display font-bold text-slate-900 tracking-tight">Admin Portal</h1>
               <p className="text-slate-500 mt-2 font-medium">Please enter your credentials to continue</p>
