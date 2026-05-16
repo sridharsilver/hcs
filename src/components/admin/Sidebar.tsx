@@ -1,5 +1,5 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { LogOut } from 'lucide-react';
 
 interface SidebarProps {
   collapsed: boolean;
@@ -8,6 +8,8 @@ interface SidebarProps {
 }
 
 export function Sidebar({ collapsed, setCollapsed, isMobile }: SidebarProps) {
+  const { signOut } = useAuth();
+  
   const navItems = [
     { label: 'Dashboard', path: '/admin/dashboard', icon: '📊' },
     { label: 'Students', path: '/admin/students', icon: '🎓' },
@@ -46,8 +48,16 @@ export function Sidebar({ collapsed, setCollapsed, isMobile }: SidebarProps) {
         ))}
       </nav>
 
-      <div className="p-6 border-t border-white/5 bg-black/20">
-        <div className="flex items-center gap-3 opacity-50">
+      <div className="p-4 border-t border-white/5 space-y-4">
+        <button 
+          onClick={() => signOut()}
+          className="flex items-center gap-3 px-4 py-3 w-full rounded-xl transition-all text-red-400 hover:text-red-300 hover:bg-red-500/10"
+        >
+          <LogOut className="h-5 w-5" />
+          {(!collapsed || isMobile) && <span className="font-medium text-sm">Sign Out</span>}
+        </button>
+
+        <div className="flex items-center gap-3 opacity-30 px-4">
           <span>🛡️</span>
           {(!collapsed || isMobile) && <span className="text-[10px] font-bold uppercase tracking-widest">Secured Panel</span>}
         </div>

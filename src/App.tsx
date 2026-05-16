@@ -36,6 +36,9 @@ import { Enquiries as AdminEnquiries } from "./pages/admin/enquiries/Enquiries";
 
 import { useTranslation } from "react-i18next";
 import { SettingsProvider } from "./contexts/SettingsContext";
+import { AuthProvider } from "./contexts/AuthContext";
+import { AuthGuard } from "./components/AuthGuard";
+import Login from "./pages/Login";
 
 const queryClient = new QueryClient();
 
@@ -72,17 +75,19 @@ const LanguageHandler = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <SettingsProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter basename="/">
-          <DocumentTitle />
-          <LanguageHandler />
-          <RoutesWithKey />
-        </BrowserRouter>
-      </TooltipProvider>
-    </SettingsProvider>
+    <AuthProvider>
+      <SettingsProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter basename="/">
+            <DocumentTitle />
+            <LanguageHandler />
+            <RoutesWithKey />
+          </BrowserRouter>
+        </TooltipProvider>
+      </SettingsProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
@@ -98,10 +103,18 @@ const RoutesWithKey = () => {
         <Route path="/branches" element={<Branches />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/login" element={<Login />} />
       </Route>
 
-      {/* Admin Routes */}
-      <Route path="/admin" element={<AdminLayout />}>
+      {/* Admin Routes - Protected */}
+      <Route 
+        path="/admin" 
+        element={
+          <AuthGuard>
+            <AdminLayout />
+          </AuthGuard>
+        }
+      >
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="branches" element={<AdminBranches />} />
