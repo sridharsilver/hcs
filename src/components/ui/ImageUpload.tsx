@@ -62,7 +62,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
             <img 
               src={value} 
               alt="Uploaded" 
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" 
+              className="h-full w-full object-contain p-2 transition-transform duration-500 group-hover:scale-105" 
             />
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
               <Button

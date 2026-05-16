@@ -2,9 +2,26 @@ import { Link } from "react-router-dom";
 import { Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin } from "lucide-react";
 import Logo from "./Logo";
 import { useTranslation } from "react-i18next";
+import { useSettings } from "@/contexts/SettingsContext";
 
 const Footer = () => {
   const { t } = useTranslation();
+  const { settings } = useSettings();
+
+  const contactInfo = {
+    email: settings?.contactInfo?.email || 'info@hcschools.in',
+    phone: settings?.contactInfo?.phone || '+91 40 2354 1100',
+    address: settings?.contactInfo?.address || t('footer.address')
+  };
+
+  const socialLinks = [
+    { icon: Facebook, url: settings?.socialLinks?.facebook, label: 'Facebook' },
+    { icon: Instagram, url: settings?.socialLinks?.instagram, label: 'Instagram' },
+    { icon: Twitter, url: settings?.socialLinks?.twitter, label: 'Twitter' },
+    { icon: Youtube, url: settings?.socialLinks?.youtube, label: 'YouTube' }
+  ];
+
+  const footerText = settings?.footerText || `© ${new Date().getFullYear()} Hyderabad Central Schools. ${t('footer.rights')}`;
 
   return (
     <footer className="bg-primary text-primary-foreground mt-20">
@@ -14,13 +31,22 @@ const Footer = () => {
             <Logo />
           </div>
           <p className="text-sm text-primary-foreground/75 leading-relaxed">
-            {t('footer.tagline')}
+            {settings?.schoolTagline || t('footer.tagline')}
           </p>
           <div className="flex gap-3 mt-5">
-            {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
-              <a key={i} href="#" aria-label="social" className="w-9 h-9 rounded-full bg-primary-foreground/10 hover:bg-accent hover:text-accent-foreground flex items-center justify-center transition-smooth">
-                <Icon className="w-4 h-4" />
-              </a>
+            {socialLinks.map(({ icon: Icon, url, label }, i) => (
+              url && (
+                <a 
+                  key={i} 
+                  href={url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  aria-label={label} 
+                  className="w-9 h-9 rounded-full bg-primary-foreground/10 hover:bg-accent hover:text-accent-foreground flex items-center justify-center transition-smooth"
+                >
+                  <Icon className="w-4 h-4" />
+                </a>
+              )
             ))}
           </div>
         </div>
@@ -54,15 +80,34 @@ const Footer = () => {
         <div>
           <h4 className="font-display font-semibold mb-4 text-base">{t('footer.getInTouch')}</h4>
           <ul className="space-y-3 text-sm text-primary-foreground/80">
-            <li className="flex gap-3"><MapPin className="w-4 h-4 mt-0.5 shrink-0 text-accent" /> {t('footer.address')}</li>
-            <li className="flex gap-3"><Phone className="w-4 h-4 mt-0.5 shrink-0 text-accent" /> +91 40 2354 1100</li>
-            <li className="flex gap-3"><Mail className="w-4 h-4 mt-0.5 shrink-0 text-accent" /> info@hcschools.in</li>
+            <li className="flex gap-3">
+              <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-accent" /> 
+              {contactInfo.address}
+            </li>
+            <li className="flex gap-3">
+              <Phone className="w-4 h-4 mt-0.5 shrink-0 text-accent" /> 
+              {contactInfo.phone}
+            </li>
+            {settings?.contactInfo?.secondaryPhone && (
+              <li className="flex gap-3 pl-7 -mt-2">
+                {settings.contactInfo.secondaryPhone}
+              </li>
+            )}
+            <li className="flex gap-3">
+              <Mail className="w-4 h-4 mt-0.5 shrink-0 text-accent" /> 
+              {contactInfo.email}
+            </li>
+            {settings?.contactInfo?.secondaryEmail && (
+              <li className="flex gap-3 pl-7 -mt-2 truncate">
+                {settings.contactInfo.secondaryEmail}
+              </li>
+            )}
           </ul>
         </div>
       </div>
       <div className="border-t border-primary-foreground/10">
         <div className="container py-5 text-xs text-primary-foreground/65 flex flex-col md:flex-row justify-between gap-2">
-          <p>© {new Date().getFullYear()} Hyderabad Central Schools. {t('footer.rights')}</p>
+          <p>{footerText}</p>
           <p>{t('footer.crafted')}</p>
         </div>
       </div>

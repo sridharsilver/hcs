@@ -28,7 +28,7 @@ export const EditBranch: React.FC = () => {
       } catch (error: any) {
         console.error('Error fetching branch:', error);
         toast.error('Branch not found');
-        navigate('/admin/branches');
+        navigate('/admin/settings?tab=campuses');
       } finally {
         setIsLoading(false);
       }
@@ -48,7 +48,7 @@ export const EditBranch: React.FC = () => {
       if (error) throw error;
 
       toast.success('Branch updated successfully');
-      navigate('/admin/branches');
+      navigate('/admin/settings?tab=campuses');
     } catch (error: any) {
       console.error('Error updating branch:', error);
       toast.error(error.message || 'Error updating branch');
@@ -72,7 +72,7 @@ export const EditBranch: React.FC = () => {
         <Button 
           variant="outline" 
           size="icon" 
-          onClick={() => navigate('/admin/branches')}
+          onClick={() => navigate('/admin/settings?tab=campuses')}
           className="h-10 w-10 rounded-xl border-border shadow-sm"
         >
           <ChevronLeft className="h-5 w-5" />

@@ -17,7 +17,8 @@ import {
   Download,
   FileText,
   FileSpreadsheet,
-  Printer,
+  LayoutGrid,
+  List,
   Search,
   Plus
 } from 'lucide-react';
@@ -44,12 +45,15 @@ import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 import { cn } from '@/lib/utils';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { AdminContent } from '@/components/admin/AdminContent';
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 
 export const Students: React.FC = () => {
   const navigate = useNavigate();
   const [students, setStudents] = useState<Student[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [selectedBranch, setSelectedBranch] = useState('All');
   const [selectedClass, setSelectedClass] = useState('All');
   const [selectedStatus, setSelectedStatus] = useState('All');
@@ -98,8 +102,8 @@ export const Students: React.FC = () => {
         .eq('id', deleteId);
 
       if (error) throw error;
-
-      toast.success('Student record deleted');
+      
+      toast.success('Student deleted successfully');
       setStudents(students.filter(s => s.id !== deleteId));
       setDeleteId(null);
     } catch (error: any) {
@@ -110,117 +114,56 @@ export const Students: React.FC = () => {
     }
   };
 
-  const columns = [
-    {
-      header: 'Student',
-      accessorKey: 'full_name',
-      cell: (student: Student) => (
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full overflow-hidden bg-muted border border-border/50">
-            {student.photo_url ? (
-              <img src={student.photo_url} alt={student.full_name} className="h-full w-full object-cover" />
-            ) : (
-              <div className="h-full w-full flex items-center justify-center text-muted-foreground">
-                <User className="h-5 w-5" />
-              </div>
-            )}
-          </div>
-          <div>
-            <div className="font-semibold text-sm">{student.full_name}</div>
-            <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
-              {student.admission_number}
-            </div>
-          </div>
-        </div>
-      )
-    },
-    {
-      header: 'Class',
-      accessorKey: 'class',
-      cell: (student: Student) => (
-        <div className="text-sm">
-          <span className="font-medium">{student.class}</span> - <span className="text-muted-foreground">{student.section}</span>
-        </div>
-      )
-    },
-    {
-      header: 'Branch',
-      accessorKey: 'branch_name',
-      cell: (student: Student) => (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Building2 className="h-3 w-3" />
-          {student.branch_name || 'N/A'}
-        </div>
-      )
-    },
-    {
-      header: 'Parent Info',
-      accessorKey: 'parent_name',
-      cell: (student: Student) => (
-        <div className="text-xs">
-          <div className="font-medium text-foreground">{student.parent_name}</div>
-          <div className="flex items-center gap-1 text-muted-foreground mt-0.5">
-            <Phone className="h-3 w-3" /> {student.mobile_number}
-          </div>
-        </div>
-      )
-    },
-    {
-      header: 'Status',
-      accessorKey: 'status',
-      cell: (student: Student) => (
-        <Badge 
-          className={cn(
-            "rounded-full px-3 font-medium",
-            student.status === 'Active' 
-              ? "bg-green-100 text-green-700 hover:bg-green-100" 
-              : "bg-muted text-muted-foreground hover:bg-muted"
-          )}
-        >
-          {student.status}
-        </Badge>
-      )
-    },
-    {
-      header: 'Actions',
-      accessorKey: 'id',
-      cell: (student: Student) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-44 rounded-xl shadow-elegant border-border/50 p-1">
-            <DropdownMenuItem 
-              onClick={() => navigate(`/admin/students/profile/${student.id}`)}
-              className="gap-2 cursor-pointer py-2 px-3 rounded-lg"
-            >
-              <Eye className="h-4 w-4 text-muted-foreground" /> View Profile
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => navigate(`/admin/students/edit/${student.id}`)}
-              className="gap-2 cursor-pointer py-2 px-3 rounded-lg"
-            >
-              <Edit className="h-4 w-4 text-muted-foreground" /> Edit Student
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => setDeleteId(student.id)}
-              className="gap-2 cursor-pointer py-2 px-3 rounded-lg text-destructive focus:text-destructive focus:bg-destructive/5"
-            >
-              <Trash2 className="h-4 w-4" /> Delete Student
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    }
-  ];
+  const handleExportCSV = () => {
+    const headers = ['Admission No', 'Name', 'Class', 'Section', 'Branch', 'Parent Name', 'Phone'];
+    const csvData = filteredStudents.map(s => [
+      s.admission_number,
+      s.full_name,
+      s.class,
+      s.section,
+      s.branch_name,
+      s.parent_name,
+      s.mobile_number
+    ]);
+    
+    const csvContent = [headers, ...csvData].map(row => row.join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `students_export_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+  };
+
+  const handleExportPDF = () => {
+    const doc = new jsPDF();
+    doc.text('HCS Students Directory', 14, 15);
+    
+    const tableData = filteredStudents.map(s => [
+      s.admission_number,
+      s.full_name,
+      s.class,
+      s.section,
+      s.branch_name,
+      s.mobile_number
+    ]);
+
+    autoTable(doc, {
+      head: [['ADM NO', 'NAME', 'CLASS', 'SEC', 'BRANCH', 'PHONE']],
+      body: tableData,
+      startY: 20,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [31, 41, 55] }
+    });
+
+    doc.save(`students_report_${new Date().toISOString().split('T')[0]}.pdf`);
+  };
 
   const filteredStudents = students.filter(student => {
     const matchesSearch = 
-      (student.full_name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-      (student.admission_number?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-      (student.parent_name?.toLowerCase() || '').includes(searchTerm.toLowerCase());
+      student.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.admission_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.parent_name?.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesBranch = selectedBranch === 'All' || student.branch_name === selectedBranch;
     const matchesClass = selectedClass === 'All' || student.class === selectedClass;
@@ -229,105 +172,107 @@ export const Students: React.FC = () => {
     return matchesSearch && matchesBranch && matchesClass && matchesStatus;
   });
 
-  // Filter out duplicate branch names for the dropdown
-  const uniqueBranches = Array.from(new Map(branches.map(b => [b.name, b])).values());
+  const columns = [
+    {
+      header: "Student",
+      accessorKey: "full_name",
+      cell: (student: Student) => (
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold overflow-hidden border border-primary/20">
+            {student.photo_url ? (
+              <img 
+                src={student.photo_url} 
+                alt={student.full_name} 
+                className="h-full w-full object-cover"
+                onError={(e) => {
+                  // Fallback if image fails to load
+                  (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(student.full_name)}&background=random`;
+                }}
+              />
+            ) : (
+              student.full_name.charAt(0)
+            )}
+          </div>
+          <div className="flex flex-col">
+            <span className="font-bold text-foreground leading-none mb-1">{student.full_name}</span>
+            <span className="text-xs text-muted-foreground tabular-nums">#{student.admission_number}</span>
+          </div>
+        </div>
+      )
+    },
+    {
+      header: "Academic",
+      accessorKey: "class",
+      cell: (student: Student) => (
+        <div className="flex flex-col">
+          <span className="text-sm font-medium">{student.class} - {student.section}</span>
+          <span className="text-[10px] text-muted-foreground uppercase tracking-wider">{student.branch_name}</span>
+        </div>
+      )
+    },
+    {
+      header: "Contact",
+      accessorKey: "mobile_number",
+      cell: (student: Student) => (
+        <div className="flex flex-col">
+          <span className="text-sm font-medium">{student.parent_name}</span>
+          <span className="text-xs text-muted-foreground flex items-center gap-1">
+            <Phone className="h-3 w-3" /> {student.mobile_number}
+          </span>
+        </div>
+      )
+    },
+    {
+      header: "Status",
+      accessorKey: "status",
+      cell: (student: Student) => (
+        <Badge variant="outline" className={cn(
+          "rounded-full px-3 font-medium",
+          student.status === 'Active' ? "bg-green-50 text-green-700 border-green-200" : "bg-red-50 text-red-700 border-red-200"
+        )}>
+          {student.status || 'Active'}
+        </Badge>
+      )
+    },
+    {
+      header: "Actions",
+      accessorKey: "actions",
+      cell: (student: Student) => (
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" onClick={() => navigate(`/admin/students/profile/${student.id}`)} className="h-8 w-8 rounded-lg hover:bg-primary/5 hover:text-primary">
+            <Eye className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => navigate(`/admin/students/edit/${student.id}`)} className="h-8 w-8 rounded-lg hover:bg-amber-50 hover:text-amber-600">
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => setDeleteId(student.id)} className="h-8 w-8 rounded-lg hover:bg-red-50 hover:text-red-600">
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      )
+    }
+  ];
 
+  const uniqueBranches = Array.from(new Map(branches.map(b => [b.name, b])).values());
   const classesList = ['Nursery', 'LKG', 'UKG', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th'];
 
-  const handleExportCSV = () => {
-    if (filteredStudents.length === 0) {
-      toast.error("No data to export");
-      return;
-    }
-
-    const headers = ["Admission No", "Full Name", "Class", "Section", "Branch", "Gender", "Parent Name", "Mobile", "Status"];
-    const csvRows = [
-      headers.join(","),
-      ...filteredStudents.map(s => [
-        `"${s.admission_number}"`,
-        `"${s.full_name}"`,
-        `"${s.class}"`,
-        `"${s.section}"`,
-        `"${s.branch_name}"`,
-        `"${s.gender}"`,
-        `"${s.parent_name}"`,
-        `"${s.mobile_number}"`,
-        `"${s.status}"`
-      ].join(","))
-    ];
-
-    const blob = new Blob([csvRows.join("\n")], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", `HCS_Students_${selectedBranch}_${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    toast.success("CSV Exported successfully");
-  };
-
-  const handleExportPDF = () => {
-    if (filteredStudents.length === 0) {
-      toast.error("No data to export");
-      return;
-    }
-
-    const doc = new jsPDF();
-    
-    // Add Header
-    doc.setFontSize(20);
-    doc.setTextColor(40);
-    doc.text("HCS Student Report", 14, 22);
-    
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text(`Branch: ${selectedBranch} | Class: ${selectedClass}`, 14, 30);
-    doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 35);
-
-    const tableColumn = ["ADM No", "Full Name", "Class", "Section", "Mobile", "Status"];
-    const tableRows = filteredStudents.map(s => [
-      s.admission_number,
-      s.full_name,
-      s.class,
-      s.section,
-      s.mobile_number,
-      s.status
-    ]);
-
-    autoTable(doc, {
-      head: [tableColumn],
-      body: tableRows,
-      startY: 45,
-      styles: { fontSize: 8, cellPadding: 3 },
-      headStyles: { fillColor: [79, 70, 229], textColor: 255 },
-      alternateRowStyles: { fillColor: [245, 247, 250] },
-      margin: { top: 45 }
-    });
-
-    doc.save(`HCS_Students_${selectedBranch}_${new Date().toISOString().split('T')[0]}.pdf`);
-    toast.success("PDF Downloaded successfully");
-  };
-
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-display font-bold text-foreground">Students</h1>
-          <p className="text-muted-foreground mt-1">Manage student records, admissions, and information.</p>
-        </div>
-        
-        <div className="bg-primary/5 p-3 rounded-2xl flex items-center gap-3 border border-primary/10">
-          <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-elegant">
-            <GraduationCap className="h-5 w-5" />
-          </div>
-          <div>
-            <div className="text-2xl font-bold leading-none">{students.length}</div>
-            <div className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Enrolled Students</div>
-          </div>
-        </div>
-      </div>
+    <AdminContent>
+      <AdminPageHeader 
+        title="Student Directory"
+        description="Manage students, records, and academic status."
+        icon={Users2}
+        stats={{
+          label: "Enrolled Students",
+          value: students.length,
+          icon: GraduationCap
+        }}
+        action={{
+          label: "Add Student",
+          onClick: () => navigate('/admin/students/add'),
+          icon: Plus
+        }}
+      />
 
       <Tabs defaultValue="All" className="w-full" onValueChange={setSelectedBranch}>
         <div className="space-y-6 mb-8">
@@ -408,11 +353,36 @@ export const Students: React.FC = () => {
                 className="h-10 gap-2 text-muted-foreground hover:text-primary rounded-xl border border-border/50 bg-background px-4 flex-1 lg:flex-none"
               >
                 <X className="h-4 w-4" />
-                <span>Reset all</span>
+                <span>Reset</span>
               </Button>
             </div>
 
             <div className="flex items-center gap-2 w-full lg:w-auto lg:ml-auto">
+              <div className="flex items-center bg-muted/30 p-1 rounded-xl border border-border/50 shadow-sm mr-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setViewMode('list')}
+                  className={cn(
+                    "h-8 w-8 p-0 rounded-lg transition-all",
+                    viewMode === 'list' ? "bg-white text-primary shadow-sm" : "text-muted-foreground hover:bg-white/50"
+                  )}
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setViewMode('grid')}
+                  className={cn(
+                    "h-8 w-8 p-0 rounded-lg transition-all",
+                    viewMode === 'grid' ? "bg-white text-primary shadow-sm" : "text-muted-foreground hover:bg-white/50"
+                  )}
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                </Button>
+              </div>
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="h-10 gap-2 rounded-xl border-border/50 bg-background px-4 flex-1 lg:flex-none">
@@ -423,7 +393,7 @@ export const Students: React.FC = () => {
                 <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-elegant p-1">
                   <DropdownMenuItem onClick={handleExportCSV} className="rounded-lg gap-2 cursor-pointer">
                     <FileSpreadsheet className="h-4 w-4 text-green-600" />
-                    <span>Export CSV (Excel)</span>
+                    <span>Export CSV</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleExportPDF} className="rounded-lg gap-2 cursor-pointer text-red-600">
                     <FileText className="h-4 w-4" />
@@ -431,12 +401,6 @@ export const Students: React.FC = () => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-
-              <Button onClick={() => navigate('/admin/students/add')} size="sm" className="gap-2 h-10 px-4 rounded-xl shadow-elegant font-bold transition-all hover:scale-[1.02] flex-1 lg:flex-none whitespace-nowrap">
-                <Plus className="h-4 w-4" />
-                <span className="hidden sm:inline">Add Student</span>
-                <span className="sm:hidden">Add</span>
-              </Button>
             </div>
           </div>
         </div>
@@ -446,6 +410,8 @@ export const Students: React.FC = () => {
           data={filteredStudents} 
           isLoading={isLoading}
           hideHeader={true}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
         />
       </Tabs>
 
@@ -455,8 +421,8 @@ export const Students: React.FC = () => {
         onConfirm={handleDelete}
         isLoading={isDeleting}
         title="Delete Student Record"
-        description="Are you sure you want to delete this student's record? This action is permanent and will remove all associated data."
+        description="Are you sure you want to delete this student's record? This action is permanent."
       />
-    </div>
+    </AdminContent>
   );
 };

@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -20,14 +19,10 @@ export const StatCard: React.FC<StatCardProps> = ({
   value, 
   icon: Icon, 
   trend, 
-  className,
-  delay = 0 
+  className
 }) => {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay }}
+    <div
       className={cn(
         "bg-card p-6 rounded-2xl shadow-card border border-border/50 hover-lift relative overflow-hidden group",
         className
@@ -54,6 +49,6 @@ export const StatCard: React.FC<StatCardProps> = ({
       </div>
 
       <div className="absolute -right-4 -bottom-4 h-24 w-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-smooth"></div>
-    </motion.div>
+    </div>
   );
 };

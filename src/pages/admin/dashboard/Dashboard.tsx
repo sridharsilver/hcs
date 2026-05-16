@@ -20,7 +20,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { StatCard } from '@/components/ui/StatCard';
@@ -37,6 +36,7 @@ import {
 import { supabase } from '@/lib/supabase';
 import { Student } from '@/types';
 import { toast } from 'sonner';
+import { AdminContent } from '@/components/admin/AdminContent';
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -63,8 +63,6 @@ export const Dashboard: React.FC = () => {
     const fetchDashboardData = async () => {
       try {
         setIsLoading(true);
-        
-        // Fetch stats counts
         const [branchesCount, studentsCount, teachersCount, galleryCount, enquiriesCount] = await Promise.all([
           supabase.from('branches').select('*', { count: 'exact', head: true }),
           supabase.from('students').select('*', { count: 'exact', head: true }),
@@ -81,7 +79,6 @@ export const Dashboard: React.FC = () => {
           enquiries: enquiriesCount.count || 0
         });
 
-        // Fetch chart data (Students per branch)
         const { data: branchesWithStudents } = await supabase
           .from('branches')
           .select(`
@@ -97,7 +94,6 @@ export const Dashboard: React.FC = () => {
           setChartData(formattedChartData);
         }
 
-        // Fetch recent admissions with branch names
         const { data: recentStudents } = await supabase
           .from('students')
           .select('*, branch:branches(name)')
@@ -106,7 +102,6 @@ export const Dashboard: React.FC = () => {
 
         setRecentAdmissions(recentStudents || []);
 
-        // Fetch recent enquiries
         const { data: enquiries } = await supabase
           .from('enquiries')
           .select('*')
@@ -130,262 +125,175 @@ export const Dashboard: React.FC = () => {
     return (
       <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
-        <p className="text-muted-foreground font-medium">Powering up your command center...</p>
+        <p className="text-muted-foreground font-medium text-sm">Loading Command Center...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-10 pb-10">
-      {/* Premium Welcome Hero */}
-      <section className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-primary via-primary/90 to-[#1e3a8a] p-8 lg:p-12 text-white shadow-2xl">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-[100px] -mr-48 -mt-48" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent/20 rounded-full blur-[80px] -ml-32 -mb-32" />
+    <AdminContent>
+      {/* Welcome Hero - No Motion */}
+      <section className="relative overflow-hidden rounded-2xl lg:rounded-[2rem] bg-gradient-to-br from-[#0a192f] to-[#112240] p-6 lg:p-10 text-white shadow-xl">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] -mr-32 -mt-32" />
         
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
-          <div className="space-y-4">
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white/90 text-sm font-medium"
-            >
-              <Zap className="h-4 w-4 text-accent fill-accent/20" />
-              <span>System Online • All Systems Nominal</span>
-            </motion.div>
-            <div className="space-y-2">
-              <h1 className="text-4xl lg:text-6xl font-display font-bold tracking-tight">
-                {getGreeting()}, <span className="text-accent italic">Admin!</span>
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/80 text-[10px] font-medium">
+              <Zap className="h-3 w-3 text-[#f59e0b]" />
+              <span>{stats.branches} Active Campuses</span>
+            </div>
+            <div className="space-y-1">
+              <h1 className="text-2xl lg:text-5xl font-bold tracking-tight">
+                {getGreeting()}, <span className="text-[#f59e0b]">Admin</span>
               </h1>
-              <p className="text-white/70 text-lg max-w-xl">
-                The command center is updated with the latest data from all {stats.branches} campuses. Here's your overview for today.
+              <p className="text-white/60 text-sm lg:text-base max-w-xl">
+                Quick overview of your school's current performance and metrics.
               </p>
             </div>
           </div>
 
-          <div className="flex flex-col items-end gap-3">
-            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 shadow-inner text-right min-w-[200px]">
-              <div className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/50 mb-1">Current Date</div>
-              <div className="text-3xl font-display font-bold">{format(new Date(), 'dd MMMM')}</div>
-              <div className="text-sm text-white/60 mt-1">{format(new Date(), 'EEEE, yyyy')}</div>
-            </div>
+          <div className="bg-white/5 border border-white/10 rounded-xl p-4 min-w-[160px]">
+            <div className="text-[9px] uppercase tracking-wider text-white/30 mb-1">Today</div>
+            <div className="text-xl font-bold">{format(new Date(), 'dd MMMM')}</div>
+            <div className="text-[10px] text-white/50">{format(new Date(), 'EEEE')}</div>
           </div>
         </div>
       </section>
 
       {/* Quick Actions Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'Add Student', icon: GraduationCap, path: '/admin/students/add', color: 'bg-blue-500' },
-          { label: 'New Enquiry', icon: MessageSquare, path: '/admin/enquiries', color: 'bg-amber-500' },
-          { label: 'Process Fee', icon: IndianRupee, path: '/admin/fees', color: 'bg-emerald-500' },
-          { label: 'Post Update', icon: Plus, path: '/admin/gallery/upload', color: 'bg-purple-500' }
-        ].map((action, i) => (
+          { label: 'Add Student', icon: GraduationCap, path: '/admin/students/add', color: 'bg-blue-600' },
+          { label: 'Enquiries', icon: MessageSquare, path: '/admin/enquiries', color: 'bg-amber-600' },
+          { label: 'Process Fee', icon: IndianRupee, path: '/admin/fees', color: 'bg-emerald-600' },
+          { label: 'Post Update', icon: Plus, path: '/admin/gallery/upload', color: 'bg-purple-600' }
+        ].map((action) => (
           <button
             key={action.label}
             onClick={() => navigate(action.path)}
-            className="group relative flex flex-col items-center justify-center p-6 rounded-3xl bg-card border border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-elegant"
+            className="flex flex-col items-center justify-center p-4 rounded-xl bg-card border border-border/50 hover:bg-muted/50 transition-all active:scale-95 shadow-sm"
           >
-            <div className={cn("h-12 w-12 rounded-2xl flex items-center justify-center text-white shadow-lg mb-3 transition-transform group-hover:scale-110", action.color)}>
-              <action.icon className="h-6 w-6" />
+            <div className={cn("h-10 w-10 rounded-lg flex items-center justify-center text-white mb-2", action.color)}>
+              <action.icon className="h-5 w-5" />
             </div>
-            <span className="font-bold text-sm text-foreground/80 group-hover:text-primary transition-colors">{action.label}</span>
-            <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-              <ArrowUpRight className="h-4 w-4 text-primary" />
-            </div>
+            <span className="font-bold text-xs text-foreground/80 text-center">{action.label}</span>
           </button>
         ))}
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
         <StatCard 
           title="Students" 
           value={stats.students.toLocaleString()} 
           icon={GraduationCap} 
-          trend={{ value: 12, isUp: true }}
-          delay={0.1}
+          className="p-4"
         />
         <StatCard 
-          title="Staff Count" 
+          title="Staff" 
           value={stats.teachers.toString()} 
           icon={Users} 
-          trend={{ value: 4, isUp: true }}
-          delay={0.2}
+          className="p-4"
         />
         <StatCard 
           title="Enquiries" 
           value={stats.enquiries.toString()} 
           icon={MessageSquare} 
-          trend={{ value: 24, isUp: true }}
-          className="border-amber-500/20"
-          delay={0.3}
+          className="border-amber-500/20 p-4"
         />
         <StatCard 
-          title="Gallery Items" 
+          title="Gallery" 
           value={stats.gallery.toLocaleString()} 
           icon={ImageIcon} 
-          delay={0.4}
+          className="p-4"
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Chart Section */}
-        <div className="lg:col-span-2 bg-card p-8 rounded-3xl shadow-card border border-border/50 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] -mr-32 -mt-32" />
-          
-          <div className="flex items-center justify-between mb-10 relative z-10">
+        <div className="lg:col-span-2 bg-card p-5 lg:p-8 rounded-2xl shadow-card border border-border/50">
+          <div className="flex items-center justify-between mb-8">
             <div>
-              <h3 className="text-xl font-display font-bold flex items-center gap-2">
+              <h3 className="text-lg font-bold flex items-center gap-2">
                 <Activity className="h-5 w-5 text-primary" />
-                Enrollment Overview
+                Enrollment
               </h3>
-              <p className="text-sm text-muted-foreground">Student distribution across all school campuses</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className="h-3 w-3 rounded-full bg-primary" />
-                <span className="text-[10px] uppercase font-bold text-muted-foreground">Primary</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="h-3 w-3 rounded-full bg-accent" />
-                <span className="text-[10px] uppercase font-bold text-muted-foreground">Campus B</span>
-              </div>
+              <p className="text-xs text-muted-foreground">Per Campus distribution</p>
             </div>
           </div>
           
-          <div className="h-[350px] w-full relative z-10">
+          <div className="h-[250px] lg:h-[300px] w-full">
             {chartData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="var(--primary)" stopOpacity={1} />
-                      <stop offset="100%" stopColor="var(--primary)" stopOpacity={0.6} />
-                    </linearGradient>
-                  </defs>
+                <BarChart data={chartData} margin={{ top: 0, right: 10, left: -25, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
-                  <XAxis 
-                    dataKey="name" 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={{ fill: '#64748b', fontSize: 11, fontWeight: 600 }} 
-                    dy={15}
-                  />
-                  <YAxis 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={{ fill: '#94a3b8', fontSize: 11 }} 
-                  />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 10 }} />
                   <Tooltip 
-                    cursor={{ fill: 'rgba(0,0,0,0.02)' }}
                     content={({ active, payload }) => {
                       if (active && payload && payload.length) {
                         return (
-                          <div className="bg-white/90 backdrop-blur-md border border-border/50 p-4 rounded-2xl shadow-elegant">
-                            <p className="text-[10px] uppercase font-bold text-primary mb-1">{payload[0].payload.name}</p>
-                            <p className="text-2xl font-bold text-foreground">{payload[0].value} <span className="text-sm font-medium text-muted-foreground">Students</span></p>
+                          <div className="bg-white border border-border/50 p-2 rounded shadow-lg text-xs">
+                            <p className="font-bold">{payload[0].payload.name}</p>
+                            <p className="text-primary">{payload[0].value} Students</p>
                           </div>
                         );
                       }
                       return null;
                     }}
                   />
-                  <Bar dataKey="students" radius={[8, 8, 0, 0]} barSize={45}>
-                    {chartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={index % 2 === 0 ? "url(#barGradient)" : "var(--accent)"} />
-                    ))}
-                  </Bar>
+                  <Bar dataKey="students" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} barSize={30} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-full flex items-center justify-center text-muted-foreground italic">
-                No branch data available for chart.
-              </div>
+              <div className="h-full flex items-center justify-center text-muted-foreground italic text-sm">No data.</div>
             )}
           </div>
         </div>
 
         {/* Intelligence Feeds */}
-        <div className="space-y-8">
-          {/* Recent Admissions */}
-          <div className="bg-card p-6 rounded-3xl shadow-card border border-border/50 overflow-hidden relative">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold flex items-center gap-2">
-                <Users className="h-5 w-5 text-primary" />
-                Admissions
-              </h3>
-              <Link to="/admin/students" className="text-[10px] font-bold uppercase text-primary hover:underline underline-offset-4 flex items-center gap-1">
-                View All <ArrowRight className="h-3 w-3" />
-              </Link>
-            </div>
-
-            <div className="space-y-5">
-              {recentAdmissions.length > 0 ? (
-                recentAdmissions.map((student) => (
-                  <div key={student.id} className="flex items-center gap-4 group cursor-pointer hover:bg-muted/30 p-2 -mx-2 rounded-2xl transition-colors">
-                    <div className="h-10 w-10 rounded-xl overflow-hidden border border-border bg-muted shrink-0">
-                      {student.photo_url ? (
-                        <img src={student.photo_url} alt={student.full_name} className="h-full w-full object-cover" />
-                      ) : (
-                        <div className="h-full w-full flex items-center justify-center text-muted-foreground">
-                          <Users className="h-4 w-4" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-bold truncate group-hover:text-primary transition-colors">{student.full_name}</h4>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <Badge variant="secondary" className="h-4 px-1.5 text-[9px] font-bold bg-primary/5 text-primary border-none">Grade {student.class}</Badge>
-                        <span className="text-[10px] text-muted-foreground font-medium">• {student.branch?.name.replace('HCS ', '') || 'Campus'}</span>
-                      </div>
-                    </div>
+        <div className="space-y-6">
+          <div className="bg-card p-5 rounded-2xl shadow-card border border-border/50">
+            <h3 className="text-sm font-bold flex items-center gap-2 mb-4">
+              <Users className="h-4 w-4 text-primary" />
+              Admissions
+            </h3>
+            <div className="space-y-3">
+              {recentAdmissions.map((student) => (
+                <div key={student.id} className="flex items-center gap-3">
+                  <div className="h-8 w-8 rounded bg-muted flex items-center justify-center text-[10px] font-bold">
+                    {student.full_name.charAt(0)}
                   </div>
-                ))
-              ) : (
-                <div className="text-center py-8 text-muted-foreground italic text-xs">No recent data.</div>
-              )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold truncate">{student.full_name}</p>
+                    <p className="text-[10px] text-muted-foreground truncate">Grade {student.class}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Pending Enquiries */}
-          <div className="bg-card p-6 rounded-3xl shadow-card border border-border/50 overflow-hidden relative">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold flex items-center gap-2 text-amber-600">
-                <MessageSquare className="h-5 w-5" />
-                Live Enquiries
-              </h3>
-              <Link to="/admin/enquiries" className="text-[10px] font-bold uppercase text-amber-600 hover:underline underline-offset-4 flex items-center gap-1">
-                Management <ArrowRight className="h-3 w-3" />
-              </Link>
-            </div>
-
-            <div className="space-y-5">
-              {recentEnquiries.length > 0 ? (
-                recentEnquiries.map((enquiry) => (
-                  <div key={enquiry.id} className="flex items-center gap-4 group cursor-pointer hover:bg-amber-50/30 p-2 -mx-2 rounded-2xl transition-colors">
-                    <div className="h-10 w-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
-                      <MessageSquare className="h-4 w-4" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-bold truncate">{enquiry.parent_name}</h4>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-[10px] text-amber-700 font-bold uppercase tracking-wider">{enquiry.grade === 'General' ? 'General' : `Grade ${enquiry.grade}`}</span>
-                        <span className="text-[10px] text-muted-foreground font-medium">• {format(new Date(enquiry.created_at), 'MMM dd')}</span>
-                      </div>
-                    </div>
-                    {enquiry.status === 'Pending' && (
-                      <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
-                    )}
+          <div className="bg-card p-5 rounded-2xl shadow-card border border-border/50">
+            <h3 className="text-sm font-bold flex items-center gap-2 mb-4 text-amber-600">
+              <MessageSquare className="h-4 w-4" />
+              Enquiries
+            </h3>
+            <div className="space-y-3">
+              {recentEnquiries.map((enquiry) => (
+                <div key={enquiry.id} className="flex items-center gap-3">
+                  <div className="h-8 w-8 rounded bg-amber-50 flex items-center justify-center text-amber-600">
+                    <MessageSquare className="h-3 w-3" />
                   </div>
-                ))
-              ) : (
-                <div className="text-center py-8 text-muted-foreground italic text-xs">No pending enquiries.</div>
-              )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold truncate">{enquiry.parent_name}</p>
+                    <p className="text-[10px] text-muted-foreground truncate">{format(new Date(enquiry.created_at), 'MMM dd')}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </AdminContent>
   );
 };
-

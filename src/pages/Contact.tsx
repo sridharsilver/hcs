@@ -6,14 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, Phone, MapPin, Facebook, Instagram, Twitter, Youtube } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { sendEmail } from "@/lib/email";
 import { useTranslation } from "react-i18next";
+import { useSettings } from "@/contexts/SettingsContext";
 
 const Contact = () => {
   const { t } = useTranslation();
+  const { settings } = useSettings();
   const [submitting, setSubmitting] = useState(false);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -47,7 +49,7 @@ const Contact = () => {
 
       toast.success("Message sent! We'll reply within one working day.");
       form.reset();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error sending message:", error);
       toast.error("Failed to send message. Please try again later.");
     } finally {
@@ -76,6 +78,40 @@ const Contact = () => {
     },
   };
 
+  const contactCards = [
+    { 
+      icon: Phone, 
+      tKey: "contact.call", 
+      lines: [
+        settings?.contactInfo?.phone || "+91 40 2354 1100",
+        settings?.contactInfo?.secondaryPhone || "+91 40 2305 4400"
+      ].filter(Boolean)
+    },
+    { 
+      icon: Mail, 
+      tKey: "contact.mail", 
+      lines: [
+        settings?.contactInfo?.email || "info@hcschools.in",
+        settings?.contactInfo?.secondaryEmail || "admissions@hcschools.in"
+      ].filter(Boolean)
+    },
+    { 
+      icon: MapPin, 
+      tKey: "contact.office", 
+      lines: settings?.contactInfo?.address?.split('\n') || [
+        "Road No. 12, Banjara Hills",
+        "Hyderabad, Telangana 500034"
+      ]
+    },
+  ];
+
+  const socialLinks = [
+    { icon: Facebook, url: settings?.socialLinks?.facebook, label: 'Facebook' },
+    { icon: Instagram, url: settings?.socialLinks?.instagram, label: 'Instagram' },
+    { icon: Twitter, url: settings?.socialLinks?.twitter, label: 'Twitter' },
+    { icon: Youtube, url: settings?.socialLinks?.youtube, label: 'YouTube' }
+  ].filter(link => link.url);
+
   return (
     <>
       <PageHero title={t('contact.heroTitle')} subtitle={t('contact.heroSubtitle')} />
@@ -88,20 +124,15 @@ const Contact = () => {
         className="py-20 bg-primary-foreground"
       >
         <div className="container grid lg:grid-cols-3 gap-6 mb-14">
-          {/* Contact Cards Staggered */}
-          {[
-            { icon: Phone, tKey: "contact.call", lines: ["+91 40 2354 1100", "+91 40 2305 4400"] },
-            { icon: Mail, tKey: "contact.mail", lines: ["info@hcschools.in", "admissions@hcschools.in"] },
-            { icon: MapPin, tKey: "contact.office", lines: ["Road No. 12, Banjara Hills", "Hyderabad, Telangana 500034"] },
-          ].map((c) => (
-            <motion.div key={c.tKey} variants={itemVariants}>
+          {contactCards.map(({ icon: Icon, tKey, lines }) => (
+            <motion.div key={tKey} variants={itemVariants}>
               <Card className="hover-lift border-border/60 h-full">
                 <CardContent className="p-7">
                   <div className="w-12 h-12 rounded-lg gradient-primary text-primary-foreground flex items-center justify-center mb-4">
-                    <c.icon className="w-6 h-6" />
+                    <Icon className="w-6 h-6" />
                   </div>
-                  <h3 className="font-semibold mb-2">{t(c.tKey)}</h3>
-                  {c.lines.map((l) => <p key={l} className="text-sm text-muted-foreground">{l}</p>)}
+                  <h3 className="font-semibold mb-2">{t(tKey)}</h3>
+                  {lines.map((l) => <p key={l} className="text-sm text-muted-foreground">{l}</p>)}
                 </CardContent>
               </Card>
             </motion.div>
@@ -166,39 +197,29 @@ const Contact = () => {
               <h3 className="font-display font-semibold text-xl mb-4">{t('contact.followTitle')}</h3>
               <p className="text-sm text-muted-foreground mb-5">{t('contact.followDesc')}</p>
              <div className="flex gap-3">
-                {[
-                  {
-                    Icon: Facebook,
-                    link: "https://facebook.com/sridharsthoughts",
-                    label: "Facebook",
-                  },
-                  {
-                    Icon: Instagram,
-                    link: "https://instagram.com/sridhar.silver",
-                    label: "Instagram",
-                  },
-                  {
-                    Icon: Twitter,
-                    link: "https://twitter.com/yourprofile",
-                    label: "Twitter",
-                  },
-                  {
-                    Icon: Youtube,
-                    link: "https://youtube.com/@yourchannel",
-                    label: "YouTube",
-                  },
-                ].map(({ Icon, link, label }, i) => (
-                  <a
-                    key={i}
-                    href={link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={label}
-                    className="w-11 h-11 rounded-full gradient-primary text-primary-foreground flex items-center justify-center hover:scale-110 transition-smooth"
-                  >
-                    <Icon className="w-5 h-5" />
-                  </a>
-                ))}
+                {socialLinks.length > 0 ? (
+                  socialLinks.map(({ icon: Icon, url, label }, i) => (
+                    <a
+                      key={i}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={label}
+                      className="w-11 h-11 rounded-full gradient-primary text-primary-foreground flex items-center justify-center hover:scale-110 transition-smooth"
+                    >
+                      <Icon className="w-5 h-5" />
+                    </a>
+                  ))
+                ) : (
+                  [Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
+                    <div
+                      key={i}
+                      className="w-11 h-11 rounded-full bg-muted text-muted-foreground flex items-center justify-center cursor-not-allowed"
+                    >
+                      <Icon className="w-5 h-5" />
+                    </div>
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>

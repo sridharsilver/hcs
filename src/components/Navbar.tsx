@@ -5,6 +5,7 @@ import Logo from "./Logo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import { useSettings } from "@/contexts/SettingsContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +16,7 @@ import {
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const { t, i18n } = useTranslation();
+  const { settings } = useSettings();
 
   const links = [
     { to: "/", label: t('nav.home') },
@@ -30,6 +32,9 @@ const Navbar = () => {
   };
 
   const currentLanguageCode = i18n.language ? i18n.language.split('-')[0] : 'en';
+  
+  // Explicitly check for false to ensure it hides when configured
+  const showLanguageSwitcher = settings ? settings.themeConfig.showLanguageSwitcher : true;
 
   return (
     <header className="sticky top-0 z-50 bg-background/85 backdrop-blur-lg border-b border-border">
@@ -54,38 +59,40 @@ const Navbar = () => {
         </nav>
         
         <div className="hidden lg:flex items-center gap-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="gap-2 rounded-full hover:bg-secondary">
-                <Globe className="h-4 w-4" />
-                <span className="text-xs font-bold uppercase">{currentLanguageCode}</span>
-                <ChevronDown className="h-3 w-3 opacity-50" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="rounded-2xl border-border/50 shadow-elegant p-2">
-              <DropdownMenuItem 
-                onClick={() => changeLanguage('en')}
-                className={cn("rounded-xl cursor-pointer py-2 px-4 gap-3", i18n.language.startsWith('en') && "bg-primary/10 text-primary")}
-              >
-                <span className="font-bold">English</span>
-                {i18n.language.startsWith('en') && <div className="h-1.5 w-1.5 rounded-full bg-primary" />}
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => changeLanguage('hi')}
-                className={cn("rounded-xl cursor-pointer py-2 px-4 gap-3", i18n.language.startsWith('hi') && "bg-primary/10 text-primary")}
-              >
-                <span className="font-bold">हिन्दी (Hindi)</span>
-                {i18n.language.startsWith('hi') && <div className="h-1.5 w-1.5 rounded-full bg-primary" />}
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => changeLanguage('te')}
-                className={cn("rounded-xl cursor-pointer py-2 px-4 gap-3", i18n.language.startsWith('te') && "bg-primary/10 text-primary")}
-              >
-                <span className="font-bold">తెలుగు (Telugu)</span>
-                {i18n.language.startsWith('te') && <div className="h-1.5 w-1.5 rounded-full bg-primary" />}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {showLanguageSwitcher && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-2 rounded-full hover:bg-secondary">
+                  <Globe className="h-4 w-4" />
+                  <span className="text-xs font-bold uppercase">{currentLanguageCode}</span>
+                  <ChevronDown className="h-3 w-3 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="rounded-2xl border-border/50 shadow-elegant p-2">
+                <DropdownMenuItem 
+                  onClick={() => changeLanguage('en')}
+                  className={cn("rounded-xl cursor-pointer py-2 px-4 gap-3", i18n.language.startsWith('en') && "bg-primary/10 text-primary")}
+                >
+                  <span className="font-bold">English</span>
+                  {i18n.language.startsWith('en') && <div className="h-1.5 w-1.5 rounded-full bg-primary" />}
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => changeLanguage('hi')}
+                  className={cn("rounded-xl cursor-pointer py-2 px-4 gap-3", i18n.language.startsWith('hi') && "bg-primary/10 text-primary")}
+                >
+                  <span className="font-bold">हिन्दी (Hindi)</span>
+                  {i18n.language.startsWith('hi') && <div className="h-1.5 w-1.5 rounded-full bg-primary" />}
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => changeLanguage('te')}
+                  className={cn("rounded-xl cursor-pointer py-2 px-4 gap-3", i18n.language.startsWith('te') && "bg-primary/10 text-primary")}
+                >
+                  <span className="font-bold">తెలుగు (Telugu)</span>
+                  {i18n.language.startsWith('te') && <div className="h-1.5 w-1.5 rounded-full bg-primary" />}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
 
           <Button asChild size="sm" className="gradient-primary text-primary-foreground border-0 shadow-lg shadow-primary/20 rounded-full px-6">
             <NavLink to="/admissions">{t('hero.applyNow')}</NavLink>
@@ -93,18 +100,20 @@ const Navbar = () => {
         </div>
 
         <div className="flex lg:hidden items-center gap-2">
-          <button
-            className="p-2 rounded-md hover:bg-secondary"
-            onClick={() => {
-              const langs = ['en', 'hi', 'te'];
-              const currentIndex = langs.indexOf(currentLanguageCode);
-              const nextLng = langs[(currentIndex + 1) % langs.length];
-              changeLanguage(nextLng);
-            }}
-            aria-label="Toggle language"
-          >
-            <Globe className="w-5 h-5" />
-          </button>
+          {showLanguageSwitcher && (
+            <button
+              className="p-2 rounded-md hover:bg-secondary"
+              onClick={() => {
+                const langs = ['en', 'hi', 'te'];
+                const currentIndex = langs.indexOf(currentLanguageCode);
+                const nextLng = langs[(currentIndex + 1) % langs.length];
+                changeLanguage(nextLng);
+              }}
+              aria-label="Toggle language"
+            >
+              <Globe className="w-5 h-5" />
+            </button>
+          )}
           <button
             className="p-2 rounded-md hover:bg-secondary"
             onClick={() => setOpen((v) => !v)}

@@ -10,7 +10,6 @@ import {
   User,
   Users,
   BookOpen,
-  Mail,
   Building2,
   X,
   Search,
@@ -18,9 +17,8 @@ import {
   Download,
   FileSpreadsheet,
   FileText,
-  Phone,
-  Printer,
-  Calendar
+  LayoutGrid,
+  List,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import jsPDF from 'jspdf';
@@ -45,6 +43,8 @@ import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 import { cn } from '@/lib/utils';
+import { AdminContent } from '@/components/admin/AdminContent';
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 
 export const Teachers: React.FC = () => {
   const navigate = useNavigate();
@@ -52,6 +52,7 @@ export const Teachers: React.FC = () => {
   const [branches, setBranches] = useState<Branch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [selectedBranch, setSelectedBranch] = useState('All');
   const [selectedSubject, setSelectedSubject] = useState('All');
   const [selectedStatus, setSelectedStatus] = useState('All');
@@ -61,12 +62,9 @@ export const Teachers: React.FC = () => {
   const fetchData = async () => {
     try {
       setIsLoading(true);
-      
-      // 1. Fetch branches first
       const { data: branchesData } = await supabase.from('branches').select('*');
       if (branchesData) setBranches(branchesData);
 
-      // 2. Fetch teachers with flexible join
       const { data: teachersData, error: teachersError } = await supabase
         .from('teachers')
         .select(`
@@ -79,7 +77,6 @@ export const Teachers: React.FC = () => {
       if (teachersError) throw teachersError;
 
       const formattedData = (teachersData || []).map(t => {
-        // Handle potential different join name results
         const bName = t.branches?.name || t.branch?.name || 'Unassigned';
         return {
           ...t,
@@ -89,8 +86,8 @@ export const Teachers: React.FC = () => {
 
       setTeachers(formattedData);
     } catch (error: any) {
-      console.error('Detailed Error fetching teachers:', error);
-      toast.error('Failed to load teachers. Check console for details.');
+      console.error('Error fetching teachers:', error);
+      toast.error('Failed to load teachers');
     } finally {
       setIsLoading(false);
     }
@@ -276,25 +273,22 @@ export const Teachers: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-display font-bold text-foreground">Teachers</h1>
-          <p className="text-muted-foreground mt-1">Manage faculty members across all branches.</p>
-        </div>
-        
-        <div className="bg-primary/5 p-3 rounded-2xl flex items-center gap-3 border border-primary/10">
-          <div className="h-10 w-10 rounded-xl bg-accent flex items-center justify-center text-accent-foreground shadow-elegant">
-            <Users className="h-5 w-5" />
-          </div>
-          <div>
-            <div className="text-2xl font-bold leading-none">
-              {selectedBranch === 'All' ? teachers.length : teachers.filter(t => t.branch_name === selectedBranch).length}
-            </div>
-            <div className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Active Faculty</div>
-          </div>
-        </div>
-      </div>
+    <AdminContent>
+      <AdminPageHeader 
+        title="Teachers"
+        description="Manage faculty members across all branches."
+        icon={Users}
+        stats={{
+          label: "Active Faculty",
+          value: selectedBranch === 'All' ? teachers.length : teachers.filter(t => t.branch_name === selectedBranch).length,
+          icon: Users
+        }}
+        action={{
+          label: "Add Teacher",
+          onClick: () => navigate('/admin/teachers/add'),
+          icon: Plus
+        }}
+      />
 
       <Tabs defaultValue="All" className="w-full" onValueChange={setSelectedBranch}>
         <div className="space-y-6 mb-8">
@@ -379,6 +373,32 @@ export const Teachers: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-2 w-full lg:w-auto lg:ml-auto">
+              {/* View Toggle */}
+              <div className="flex items-center bg-muted/30 p-1 rounded-xl border border-border/50 shadow-sm mr-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setViewMode('list')}
+                  className={cn(
+                    "h-8 w-8 p-0 rounded-lg transition-all",
+                    viewMode === 'list' ? "bg-white text-primary shadow-sm" : "text-muted-foreground hover:bg-white/50"
+                  )}
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setViewMode('grid')}
+                  className={cn(
+                    "h-8 w-8 p-0 rounded-lg transition-all",
+                    viewMode === 'grid' ? "bg-white text-primary shadow-sm" : "text-muted-foreground hover:bg-white/50"
+                  )}
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                </Button>
+              </div>
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="h-10 gap-2 rounded-xl border-border/50 bg-background px-4 flex-1 lg:flex-none">
@@ -397,12 +417,6 @@ export const Teachers: React.FC = () => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-
-              <Button onClick={() => navigate('/admin/teachers/add')} size="sm" className="gap-2 h-10 px-4 rounded-xl shadow-elegant font-bold transition-all hover:scale-[1.02] flex-1 lg:flex-none whitespace-nowrap">
-                <Plus className="h-4 w-4" />
-                <span className="hidden sm:inline">Add Teacher</span>
-                <span className="sm:hidden">Add</span>
-              </Button>
             </div>
           </div>
         </div>
@@ -412,6 +426,8 @@ export const Teachers: React.FC = () => {
           data={filteredTeachers} 
           isLoading={isLoading}
           hideHeader={true}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
         />
       </Tabs>
 
@@ -423,6 +439,6 @@ export const Teachers: React.FC = () => {
         title="Delete Teacher Profile"
         description="Are you sure you want to delete this teacher's profile?"
       />
-    </div>
+    </AdminContent>
   );
 };

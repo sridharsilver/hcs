@@ -15,6 +15,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
+import { AdminContent } from '@/components/admin/AdminContent';
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 
 export const Gallery: React.FC = () => {
   const navigate = useNavigate();
@@ -72,28 +74,17 @@ export const Gallery: React.FC = () => {
   });
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-display font-bold text-foreground">Media Gallery</h1>
-          <p className="text-muted-foreground mt-1 text-sm">Manage school life highlights and event photos.</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button 
-            variant="outline" 
-            onClick={() => navigate('/admin/gallery/categories')}
-            className="rounded-xl border-border/60 flex items-center gap-2"
-          >
-            <Tag className="h-4 w-4" /> Categories
-          </Button>
-          <Button 
-            onClick={() => navigate('/admin/gallery/upload')}
-            className="rounded-xl shadow-elegant bg-primary hover:bg-primary/90 flex items-center gap-2"
-          >
-            <Plus className="h-5 w-5" /> Add Image
-          </Button>
-        </div>
-      </div>
+    <AdminContent>
+      <AdminPageHeader 
+        title="Media Gallery"
+        description="Manage school life highlights and event photos."
+        icon={ImageIcon}
+        action={{
+          label: "Add Image",
+          onClick: () => navigate('/admin/gallery/upload'),
+          icon: Plus
+        }}
+      />
 
       <div className="flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
@@ -244,6 +235,6 @@ export const Gallery: React.FC = () => {
         confirmText="Yes, delete it"
         variant="destructive"
       />
-    </div>
+    </AdminContent>
   );
 };

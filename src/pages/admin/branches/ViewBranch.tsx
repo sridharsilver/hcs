@@ -48,7 +48,7 @@ export const ViewBranch: React.FC = () => {
         setBranch(formattedBranch as any);
       } catch (error) {
         console.error('Error:', error);
-        navigate('/admin/branches');
+        navigate('/admin/settings?tab=campuses');
       } finally {
         setIsLoading(false);
       }
@@ -74,7 +74,7 @@ export const ViewBranch: React.FC = () => {
         <Button 
           variant="outline" 
           size="icon" 
-          onClick={() => navigate('/admin/branches')}
+          onClick={() => navigate('/admin/settings?tab=campuses')}
           className="rounded-xl border-border shadow-sm"
         >
           <ChevronLeft className="h-5 w-5" />

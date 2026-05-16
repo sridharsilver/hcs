@@ -20,7 +20,7 @@ export const AddBranch: React.FC = () => {
       if (error) throw error;
 
       toast.success('Branch created successfully');
-      navigate('/admin/branches');
+      navigate('/admin/settings?tab=campuses');
     } catch (error: any) {
       console.error('Error creating branch:', error);
       toast.error(error.message || 'Error creating branch');
@@ -35,7 +35,7 @@ export const AddBranch: React.FC = () => {
         <Button 
           variant="outline" 
           size="icon" 
-          onClick={() => navigate('/admin/branches')}
+          onClick={() => navigate('/admin/settings?tab=campuses')}
           className="h-10 w-10 rounded-xl border-border shadow-sm"
         >
           <ChevronLeft className="h-5 w-5" />

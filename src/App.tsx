@@ -36,6 +36,7 @@ import { Enquiries as AdminEnquiries } from "./pages/admin/enquiries/Enquiries";
 
 
 import { useTranslation } from "react-i18next";
+import { SettingsProvider } from "./contexts/SettingsContext";
 
 const queryClient = new QueryClient();
 
@@ -72,15 +73,17 @@ const LanguageHandler = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter basename="/">
-        <DocumentTitle />
-        <LanguageHandler />
-        <RoutesWithKey />
-      </BrowserRouter>
-    </TooltipProvider>
+    <SettingsProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter basename="/">
+          <DocumentTitle />
+          <LanguageHandler />
+          <RoutesWithKey />
+        </BrowserRouter>
+      </TooltipProvider>
+    </SettingsProvider>
   </QueryClientProvider>
 );
 
